@@ -1,9 +1,19 @@
 ###############################################
-# Sample fhem module, one-level approach, controlling a single device like a
-# directly attached heating regulator.
-# The alternative is a two level approach, where a physical device like a CUL
-# is a bridge to a large number of logical devices (like FS20 actors, S300
-# sensors, etc)
+#$Id: 70_PushNotifier.pm 2014-07-22 11:07:00 xusader
+#
+#	download client-app http://pushnotifier.de/apps/
+#	create account http://pushnotifier.de/login/
+#	get apiToken from http://gidix.de/setings/api/ and add a new app 
+#	get appToken with:
+#	curl -s -F apiToken="apiToken=your apiToken" -F username="your username" -F password="your password" http://a.pushnotifier.de/1/login 
+#	get deviceID with:
+#	curl -s -F "apiToken=your apiToken" -F "appToken=your appToken" http://a.pushnotifier.de/1/getDevices
+#
+#	define yourname PushNotifier apiToken appToken appname deviceID
+#
+#	notify example:
+#	define LampON notify Lamp:on {fhem("set yourname message Your message!")}
+#
 
 package main;
 use LWP::UserAgent;
@@ -43,18 +53,19 @@ PushNotifier_Define($$)
 sub
 PushNotifier_Set($@)
 {
-  my ($hash, $name, $msg, @args) = @_;
+  my ($hash, $name, $cmd, @a) = @_;
 	my %sets = ('message' => 1);
-	if(!defined($sets{$msg})) {
-		return "Unknown argument $msg, choose one of " . join(" ", sort keys %sets);
+	if(!defined($sets{$cmd})) {
+		return "Unknown argument $cmd, choose one of " . join(" ", sort keys %sets);
 	}  
-    return PushNotifier_Send_Message($hash, @args);  
+    return PushNotifier_Send_Message($hash, @a);
 }
 #####################################
 sub
-PushNotifier_Send_Message($@)
+PushNotifier_Send_Message#($@)
 {
-  my ($hash, $msg) = @_;
+  my $hash = shift;
+  my $msg = join(" ", @_);
   my $apiToken = $hash->{apiToken};
   my $appToken = $hash->{appToken};
   my $app = $hash->{app};
