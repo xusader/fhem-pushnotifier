@@ -9,10 +9,11 @@
 #	get deviceID with:
 #	curl -s -F "apiToken=your apiToken" -F "appToken=your appToken" http://a.pushnotifier.de/1/getDevices
 #
+#	Define example:
 #	define yourname PushNotifier apiToken appToken appname deviceID
 #
 #	notify example:
-#	define LampON notify Lamp:on {fhem("set yourname message Your message!")}
+#	define LampON notify Lamp:on set yourDefineName message Your message!
 #
 
 package main;
@@ -80,7 +81,7 @@ PushNotifier_Send_Message#($@)
 	'content' => "$msg"
     );
 
-    LWP::UserAgent->new()->post("http://a.pushnotifier.de/1/sendToDevice", \%settings);
+    my $response = LWP::UserAgent->new()->post("http://a.pushnotifier.de/1/sendToDevice", \%settings);
  
     my $error_chk = $response->as_string;    
 
@@ -89,7 +90,7 @@ PushNotifier_Send_Message#($@)
 	}
 	else 
 	{
-	return "$error_chk"; 
+	return $error_chk; 
     }
    
 }
