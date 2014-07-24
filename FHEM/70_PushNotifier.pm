@@ -89,7 +89,7 @@ PushNotifier_Send_Message#($@)
 	}
 	else 
 	{
-	return $error_chk; 
+	return "$error_chk"; 
     }
    
 }
