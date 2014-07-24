@@ -81,7 +81,17 @@ PushNotifier_Send_Message#($@)
     );
 
     LWP::UserAgent->new()->post("http://a.pushnotifier.de/1/sendToDevice", \%settings);
-    return undef;     
+ 
+    my $error_chk = $response->as_string;    
+
+    if($error_chk =~ m/"status":"ok"/) {
+	return "OK";
+	}
+	else 
+	{
+	return $error_chk; 
+    }
+   
 }
 
 1;
