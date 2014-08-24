@@ -1,6 +1,6 @@
 fhem-pushnotifier
 =================
 
-FHEM module to get pushnotifications from PushNotifier.
+FHEM module to get pushnotifications with PushNotifier.
 
 http://www.fhemwiki.de/wiki/PushNotifier
