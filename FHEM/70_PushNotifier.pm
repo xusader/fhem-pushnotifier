@@ -57,18 +57,11 @@ PushNotifier_Define($$)
 	['apiToken' => $apiToken,
 	'appToken' => $appToken]);
   my $strg_chkID = $responseID->as_string;
-  $strg_chkID =~ s/[-"{}_]//g;
 
-  $re1='.*?';
-  $re2='(\\[.*?\\])';
-
-  $re=$re1.$re2;
-  if ($strg_chkID =~ m/$re/is)
-  {
-    $sbraces1=$1;
-    my $devices = $sbraces1;
-    $hash->{devices} = $devices;
-  }
+  $strg_chkID =~ /\[(.*),(.*)\]/;
+  my $devIDs = $1;
+  $devIDs =~ s/[-"{}_]//g;
+  $hash->{devices} = $devIDs;
 
   return undef; 
   }
