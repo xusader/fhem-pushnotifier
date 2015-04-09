@@ -176,7 +176,7 @@ PushNotifier_Send_Message
   PushNotifier ist ein Dienst, um Benachrichtigungen von einer vielzahl
   von Quellen auf Deinem Smartphone oder Tablet zu empfangen.<br>
   Du brauchst einen Account um dieses Modul zu verwenden.<br>
-  Für weitere Informationen besuche <a href="http://www.fhemwiki.de/wiki/PushNotifier">FhemWiki PushNotifier</a>.<br>
+  F��r weitere Informationen besuche <a href="http://www.fhemwiki.de/wiki/PushNotifier">FhemWiki PushNotifier</a>.<br>
   <br>
   Diskutiere das Modul <a href="http://forum.fhem.de/index.php/topic,25440.0.html">hier</a>.<br>
   <br>
@@ -222,3 +222,4 @@ PushNotifier_Send_Message
 
 =end html_DE
 =cut
+
