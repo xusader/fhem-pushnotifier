@@ -86,23 +86,34 @@ PushNotifier_Send_Message
   my $msg = join(" ", @_);
   $msg =~ s/\_/\n/g;
 
-  my $response = LWP::UserAgent->new()->post('http://a.pushnotifier.de/1/sendToDevice', 
-	['apiToken' => $hash->{apiToken},
-	'appToken' => $hash->{appToken},
-	'app' => $hash->{app},
-	'deviceID' => $hash->{deviceID},
-	'type' => 'MESSAGE',
-	'content' => "$msg"]);
+  my $result="";
 
-    my $error_chk = $response->as_string; 
+  while ($hash->{devices} =~ /title:([^,.]+),id:(\d+),model:([^,^\].]+)/g) {
+      my ($nd_title, $nd_id, $nd_model) = ("$1", "$2", "$3");
 
-    if($error_chk =~ m/"status":"ok"/) {
-	return "OK!\n\n$msg";
-	}
-	else 
-	{
-	return $error_chk; 
-    }   
+      # Log3 (undef, 3, "PushNotifier: Send Message $msg to device title: $nd_title, id: $nd_id, model: $nd_model");
+
+      if ( $nd_id =~ m/$hash->{deviceID}/ || $nd_title =~ m/$hash->{deviceID}/ || $nd_model =~ m/$hash->{deviceID}/ ) {
+        my $response = LWP::UserAgent->new()->post('http://a.pushnotifier.de/1/sendToDevice',
+          ['apiToken' => $hash->{apiToken},
+           'appToken' => $hash->{appToken},
+           'app' => $hash->{app},
+           'deviceID' => $nd_id,
+           'type' => 'MESSAGE',
+           'content' => "$msg"]);
+
+        my $error_chk = $response->as_string;
+
+        if($error_chk =~ m/"status":"ok"/) {
+          $result.="OK! Message sent to $nd_title (id: $nd_id)\n\n$msg\n\n";
+        }
+        else
+        {
+          $result.="ERROR sending message to $nd_title (id: $nd_id)\n\nResponse:\n$error_chk\n\n";
+        }
+      }
+    }
+  return $result;
 }
 
 1;
