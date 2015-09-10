@@ -1,15 +1,28 @@
 ###############################################
-#$Id: 70_PushNotifier.pm 2014-12-16 17:00:00 xusader
+#$Id: 70_PushNotifier.pm 2015-09-10 06:30:00 xusader
+#
+#	regex part by pirmanji
 #
 #	download client-app http://pushnotifier.de/apps/
 #	create account http://pushnotifier.de/login/
-#	get apiToken from http://gidix.de/setings/api/ and add a new app 
+#	
+#	register your app:
+#	http://pushnotifier.de/settings/api
 #
-#	Define example:
-#	define yourname PushNotifier apiToken appname user password deviceID
+#	Define example for all devices:
+#	define yourname PushNotifier apiToken appname user password .*
+#
+#	Define example for device group:
+#	define yourname PushNotifier apiToken appname user password iPhone.*
+#
+#	Define example for specific device:
+#	define yourname PushNotifier apiToken appname user password iPhone5
 #
 #	notify example:
 #	define LampON notify Lamp:on set yourDefineName message Your message!
+#
+#	notify with two lines:
+#	define LampON notify Lamp:on set yourDefineName message Your message!_Second Line message
 #
 
 package main;
