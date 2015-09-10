@@ -76,8 +76,7 @@ PushNotifier_Define($$)
 	'appToken' => $appToken]);
   my $strg_chkID = $responseID->as_string;
 
-  $strg_chkID =~ /\[(.*),(.*)\]/;
-  my $devIDs = $1;
+  (my $devIDs = $strg_chkID) =~ s/.*\{"status":.*,"devices":\[(.*)\]\}/$1/s;
   $devIDs =~ s/[-"{}_]//g;
   $hash->{devices} = $devIDs;
 
@@ -108,7 +107,7 @@ PushNotifier_Send_Message
   my $mc=0;
 
   try {
-    while ($hash->{devices} =~ /title:(.*?),id:(\d+),model:(.*?)(?=,title:|\])/g) {
+    while ($hash->{devices} =~ /title:(.*?),id:(\d+),model:(.*?)(?=,title:|$)/g) {
         my ($nd_title, $nd_id, $nd_model) = ("$1", "$2", "$3");
 
         # Log3 (undef, 3, "PushNotifier: Send Message $msg to device title: $nd_title, id: $nd_id, model: $nd_model");
