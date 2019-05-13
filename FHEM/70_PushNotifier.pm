@@ -1,5 +1,5 @@
 ###############################################
-#$Id: 70_PushNotifier.pm 2015-09-10 20:30:00 xusader
+#$Id: 70_PushNotifier.pm 11040 2016-03-10 14:42:46Z xusader $
 #
 #	regex part by pirmanji
 #
@@ -36,6 +36,7 @@ PushNotifier_Initialize($)
 
   $hash->{DefFn}   = "PushNotifier_Define";
   $hash->{SetFn}   = "PushNotifier_Set";
+  $hash->{GetFn}   = "PushNotifier_Get";
 
 }
 
@@ -105,6 +106,7 @@ PushNotifier_Send_Message
 {
   my $hash = shift;
   my $msg = join(" ", @_);
+  Log3 $name, 3, "PushNotifier: Send message '$msg' ...";
   $msg =~ s/\_/\n/g;
 
   my $result="";
@@ -114,7 +116,7 @@ PushNotifier_Send_Message
     while ($hash->{devices} =~ /title:(.*?),id:(\d+),model:(.*?)(?=,title:|$)/g) {
         my ($nd_title, $nd_id, $nd_model) = ("$1", "$2", "$3");
 
-        # Log3 (undef, 3, "PushNotifier: Send Message $msg to device title: $nd_title, id: $nd_id, model: $nd_model");
+        Log3 $name, 3, "PushNotifier: ... to device title: $nd_title, id: $nd_id, model: $nd_model";
 
         if ( $nd_id =~ m/$hash->{deviceID}/ || $nd_title =~ m/$hash->{deviceID}/ || $nd_model =~ m/$hash->{deviceID}/ ) {
           my $response = LWP::UserAgent->new()->post('http://a.pushnotifier.de/1/sendToDevice',
@@ -146,6 +148,49 @@ PushNotifier_Send_Message
   }
 
   return;
+}
+#####################################
+sub 
+PushNotifier_Get($@)
+{
+  my ( $hash, @a ) = @_;
+  my $name = $hash->{NAME};
+
+  # Disabled
+  return undef if ( IsDisabled($name) );
+
+  return "Need a parameter for get" if ( @a < 2 );
+
+  my $cmd   = $a[1];
+  my $value = $a[2];
+  my $list  = undef;
+
+  $list .= " devices:noArg";
+
+  if ( $cmd eq "devices" ) {
+		Log3 $name, 3, "PushNotifier: get devices for $hash->{appToken}, $hash->{apiToken}";
+
+		my $responseAT = LWP::UserAgent->new()->post("http://a.pushnotifier.de/1/login",
+      ['apiToken' => $hash->{apiToken},
+      'username' => $hash->{user},
+      'password' => $hash->{passwd}]);
+
+    my $responseID = LWP::UserAgent->new()->post("http://a.pushnotifier.de/1/getDevices",
+      ['apiToken' => $hash->{apiToken},
+      'appToken' => $hash->{appToken}]);
+  	my $strg_chkID = $responseID->as_string;
+
+  	(my $devIDs = $strg_chkID) =~ s/.*\{"status":.*,"devices":\[(.*)\]\}/$1/s;
+  	$devIDs =~ s/[-"{}_]//g;
+  	$hash->{devices} = $devIDs;
+
+    my $ret = "Devices: " . $devIDs;
+    $ret =~ s/title:/\n\t/g;
+    return $ret;
+  }
+  else {
+    return "Unknown argument $cmd, choose one of $list";
+  }
 }
 
 1;
@@ -193,6 +238,19 @@ PushNotifier_Send_Message
     Linebreak:
     <ul>
       <code>set PushNotifier1 message This is a text._New Line.</code><br>
+    </ul>
+  </ul>
+  <br>
+  <a name="PushNotifierGet"></a>
+  <b>Get</b>
+  <ul>
+    <code>get &lt;PushNotifier_device&gt; devices</code>
+    <br><br>
+    Update device list in case you have added or deleted devices in your PushNotifier account.
+    <br><br>
+    Example:
+    <ul>
+      <code>get PushNotifier1 devices</code><br>
     </ul>
   </ul>
   <br>
@@ -247,7 +305,18 @@ PushNotifier_Send_Message
     </ul>
   </ul>
   <br>
-  <b>Get</b> <ul>N/A</ul><br>
+  <a name="PushNotifierGet"></a>
+  <b>Get</b>
+  <ul>
+    <code>get &lt;PushNotifier_device&gt; devices</code>
+    <br><br>
+    Aktualisieren der Device-Liste nach hinzufügen/entfernen von Geräten im PushNotifier-Account
+    <br><br>
+    Beispiel:
+    <ul>
+      <code>get PushNotifier1 devices</code><br>
+    </ul>
+  </ul>
   <br>
   <a name="PushNotifierEvents"></a>
   <b>Generated events:</b>
